@@ -1,4 +1,4 @@
-export default asyncHandler = (fn) => async(req, res) => {
+module.exports = asyncHandler = (fn) => async(req, res) => {
     try {
         await fn(req, res);
     } catch (error) {
