@@ -1,6 +1,7 @@
-const User = require('../models/User.models.js');
+const User = require('../models/User.js');
 const ApiError = require('../utils/ApiError');
-const asyncHandler = require('../utils/AsyncHandler.js')
+const asyncHandler = require('../utils/AsyncHandler.js');
+const ApiResponse = require('../utils/ApiResponse.js'); // Add this line to import the ApiResponse class
 
 const generateAccessAndRefreshTokens = async(userId) =>{
     try {

@@ -48,35 +48,36 @@ userSchema.pre('save',async(next)=>{
     return next();
 })
 
-userSchema.methods.isPasswordCorrect(async(password)=>{
-    return await bcrypt.compare(this.password,password)
-})
-
-userSchema.methods.generateAccessToken(async()=>{
+// userSchema.methods.isPasswordCorrect(async(password)=>{
+//     return await bcrypt.compare(this.password,password)
+// })
+userSchema.methods.isPasswordCorrect = async function(password) {
+    return await bcrypt.compare(password, this.password);
+};
+userSchema.methods.generateAccessToken = async function() {
     return await jwt.sign({
-        _id : this._id,
-        email : this.email,
-        userName : this.userName,
-        role : this.role,
+        _id: this._id,
+        email: this.email,
+        userName: this.userName,
+        role: this.role,
     },
     process.env.ACCESS_SECRET_TOKEN,
     {
-        expiresIn : ACCESS_TOKEN_EXPIRY
-    }
-    )
-})
+        expiresIn: ACCESS_TOKEN_EXPIRY
+    });
+};
 
-userSchema.methods.generateRefreshToken(async()=>{
+userSchema.methods.generateRefreshToken = async function() {
     return await jwt.sign({
-
-        _id : this._id,
-
+        _id: this._id,
     },
     process.env.REFRESH_SECRET_TOKEN,
     {
-        expiresIn : REFRESH_TOKEN_EXPIRY
-    }
-    )
-})
+        expiresIn: REFRESH_TOKEN_EXPIRY
+    });
+};
 
-module.exports = mongoose.model("User",userSchema);
+const ACCESS_TOKEN_EXPIRY = 3600; // Set the desired value for access token expiry in seconds
+const REFRESH_TOKEN_EXPIRY = 86400; // Set the desired value for refresh token expiry in seconds
+
+module.exports = mongoose.model("User", userSchema);

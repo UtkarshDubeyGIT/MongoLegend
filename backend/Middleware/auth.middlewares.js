@@ -1,6 +1,8 @@
 const ApiError = require('../utils/ApiError')
 const jwt = require('jsonwebtoken')
 require('dotenv').config();
+const UserActivation = require('../models/UserActivation'); // Add this line to import the UserActivation model
+
 const verifyJwt = async (req,res,next) =>{
     
     try {
