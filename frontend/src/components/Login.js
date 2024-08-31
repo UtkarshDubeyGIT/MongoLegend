@@ -2,23 +2,42 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaUser, FaLock } from 'react-icons/fa';
 import axiosInstance from '../axiosInstance';
-const Login = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const navigate = useNavigate();
+import { toast } from 'react-hot-toast';
+import axios from 'axios';
+const Login =()=>{
+  const [data,setdata] = useState({name:"",password : ""});
+  const navigate = useNavigate(); // Call useNavigate to get the navigate function
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const changeHandler = (event)=>{
+      const {name,value} = event.target;
+      setdata((prev)=>(
+          {...prev,[name] : value}
+      ))
+  }
 
-    try {
-      const response = await axiosInstance.post('/login', { username, password });
-      localStorage.setItem('token', response.data.token); // Save token to localStorage
-      navigate('/home');
-    } catch (error) {
-      console.error('Login Error:', error.response?.data?.msg || error.message);
-      alert('Login failed: ' + (error.response?.data?.msg || 'An error occurred'));
-    }
-  };
+  const submitHandler = async (event) => {
+  event.preventDefault();
+  // const { name, email, password } = data;
+  try {
+      const response = await axios.post('https://food-back-5pkd.onrender.com/api/v1/loggedin', 
+          JSON.stringify(data), {
+              headers: {
+                  'Content-Type': 'application/json'
+              }
+          }
+      );
+      if (response.data.success) {
+          localStorage.setItem('token', response.data.token);
+          toast.success("Successfully logged in");
+          window.location.replace('/');
+      } else {
+          toast.error("Incorrect details");
+      }
+  } catch (err) {
+      console.error(err);
+      toast.error("An error occurred while logging in. Please try again.");
+  }
+};
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -30,15 +49,15 @@ const Login = () => {
         </div>
         <h2 className="text-2xl font-semibold text-center text-blue-700 mb-4">Login</h2>
         <p className="text-center text-gray-500 mb-6">Sign in to your account</p>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={submitHandler}>
           <div className="mb-4">
             <label htmlFor="username" className="block text-gray-700 mb-2">Username</label>
             <div className="relative">
               <input
                 type="text"
                 id="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={data.name}
+                onChange={changeHandler} 
                 className="w-full p-3 pl-10 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Username"
               />
@@ -53,8 +72,8 @@ const Login = () => {
               <input
                 type="password"
                 id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={data.password}
+                onChange={changeHandler} 
                 className="w-full p-3 pl-10 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Password"
               />
@@ -67,7 +86,7 @@ const Login = () => {
         <p className="text-center text-gray-500 mt-4 pb-4">
           I forgot my password. <a href="#" className="text-blue-600 hover:underline">Click here to reset</a>
         </p><button
-            type="submit"
+            type="submit" onClick={submitHandler}
             className="w-full bg-blue-600 text-white py-3 px-4 rounded hover:bg-blue-700 transition duration-300"
           >
             Login

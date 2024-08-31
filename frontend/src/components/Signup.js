@@ -1,32 +1,39 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FaUser, FaEnvelope, FaLock } from 'react-icons/fa'
-import axiosInstance from '../axiosInstance';
+import { useState } from "react";
+import { NavLink } from "react-router-dom";
+import toast from "react-hot-toast";
+import axios from "axios";
+import { FaUser, FaEnvelope, FaLock } from "react-icons/fa";
+export const SignUp =()=>{
+    const [data,setdata] = useState({name:"",email:"",password : "",cpassword:""});
 
-const Signup = () => {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const navigate = useNavigate();
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (password !== confirmPassword) {
-      alert("Passwords do not match!");
-      return;
+    const changeHandler = (event)=>{
+        const {name,value} = event.target;
+        setdata((prev)=>(
+            {...prev,[name] : value}
+        ))
     }
+
+    const submitHandler = async (event) => {
+    event.preventDefault();
 
     try {
-      const response = await axiosInstance.post('/register', { username, email, password });
-      localStorage.setItem('token', response.data.token); // Save token to localStorage
-      navigate('/home');
-    } catch (error) {
-      console.error('Signup Error:', error.response?.data?.msg || error.message);
-      alert('Signup failed: ' + (error.response?.data?.msg || 'An error occurred'));
-    }
-  };
+        const response = await axios.post('https://food-back-5pkd.onrender.com/api/v1/signedin', JSON.stringify(data), {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
 
+        if (response.data.success) {
+            toast.success("Successful");
+            window.location.replace('/login');
+        } else {
+            toast.error("Invalid Details");
+        }
+    } catch (err) {
+        console.error(err);
+        toast.error("An error occurred while signing in. Please try again.");
+    }
+};
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg relative mt-3">
@@ -37,15 +44,15 @@ const Signup = () => {
         </div>
         <h2 className="text-2xl font-semibold text-center text-blue-700 mb-4">Register</h2>
         <p className="text-center text-gray-500 mb-6">Create a new account</p>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={submitHandler}>
           <div className="mb-4">
             <label htmlFor="username" className="block text-gray-700 mb-2">Username</label>
             <div className="relative">
               <input
                 type="text"
                 id="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={data.name}
+                onChange={changeHandler}
                 className="w-full p-3 pl-10 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Username"
               />
@@ -60,8 +67,8 @@ const Signup = () => {
               <input
                 type="email"
                 id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={data.email}
+                onChange={changeHandler}
                 className="w-full p-3 pl-10 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Email"
               />
@@ -76,8 +83,8 @@ const Signup = () => {
               <input
                 type="password"
                 id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={data.password}
+                onChange={changeHandler}
                 className="w-full p-3 pl-10 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Password"
               />
@@ -92,8 +99,8 @@ const Signup = () => {
               <input
                 type="password"
                 id="confirm-password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                value={data.cpassword}
+                onChange={changeHandler}
                 className="w-full p-3 pl-10 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Confirm Password"
               />
@@ -103,24 +110,20 @@ const Signup = () => {
             </div>
           </div>
           <button
-            type="submit"
+            type="submit" onClick={submitHandler}
             className="w-full bg-blue-600 text-white py-3 px-4 rounded hover:bg-blue-700 transition duration-300"
           >
             Register
           </button>
         </form>
-        <div className="flex justify-between mt-6">
+        <div className="flex justify-center mt-6">
+          
           <button
-            onClick={() => navigate('/')}
-            className="bg-gray-700 text-white py-2 px-4 rounded hover:bg-gray-800 transition duration-300"
+            
+            className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700 transition duration-300"
           >
-            Back to Home
-          </button>
-          <button
-            onClick={() => navigate('/login')}
-            className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition duration-300"
-          >
-            Already have an account? Login
+          <NavLink to ="/login">  Already have an account? Login</NavLink>
+          
           </button>
         </div>
       </div>
@@ -128,4 +131,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default SignUp;
